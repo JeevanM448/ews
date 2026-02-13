@@ -2,6 +2,8 @@ from datetime import datetime
 from backend.services.weather_api import fetch_weather_data
 from backend.services.aqi_api import fetch_aqi_data
 import logging
+import math
+from backend.utils.feature_engineering import feature_engineer
 
 logger = logging.getLogger(__name__)
 
@@ -50,16 +52,20 @@ async def get_environmental_data(lat: float, lon: float):
         # 3. Time-based Features
         now = datetime.now()
         
-        # Placeholder for real historical data (requires DB or historical API)
-        # We simulate these based on current values for now
-        simulated_3d_avg = round(temp * 0.98, 1) # Simulation
-        simulated_7d_rain = round(weather_features["rainfall"] * 2.5, 1)
+        # Simulated historical data inputs
+        mock_temp_history = [temp * (1 + 0.05 * math.sin(i)) for i in range(3)]
+        mock_rain_history = [weather_features["rainfall"] * (1 + 0.2 * i) for i in range(7)]
+
+        avg_3d = feature_engineer.calculate_3day_temp_avg(mock_temp_history)
+        rain_7d = feature_engineer.calculate_7day_rainfall_total(mock_rain_history)
+        heat_idx = feature_engineer.compute_heat_index(temp, weather_features["humidity"])
 
         time_features = {
             "hour_of_day": now.hour,
-            "day_of_week": now.weekday(), # 0=Monday, 6=Sunday
-            "3_day_temp_avg": simulated_3d_avg,
-            "7_day_rain_total": simulated_7d_rain
+            "day_of_week": now.weekday(),
+            "3_day_temp_avg": avg_3d,
+            "7_day_rain_total": rain_7d,
+            "heat_index": heat_idx
         }
 
         # Aggregate Result

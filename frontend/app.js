@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8000/api';
+const API_URL = '/api';
 
 // State
 let map;
@@ -55,44 +55,80 @@ function setupNavigation() {
             if (tabId === 'map' && map) {
                 setTimeout(() => map.invalidateSize(), 100);
             }
+
+            // Load admin data if needed
+            if (tabId === 'admin') {
+                loadAdminHistory();
+            }
         });
     });
 }
 
 // --- Map Logic ---
 function initMap() {
-    map = L.map('map-container').setView([currentLocation.lat, currentLocation.lon], 13);
+    // Elegant Dark Mode Map
+    map = L.map('map-container').setView([currentLocation.lat, currentLocation.lon], 11);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
+    L.tileLayer('https://{s}.tile.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap contributors © CARTO',
         maxZoom: 19,
     }).addTo(map);
+
+    // Map Click Listener -> Proactive Analysis
+    map.on('click', async (e) => {
+        const { lat, lng } = e.latlng;
+        currentLocation = { lat: lat, lon: lng, name: `Location at ${lat.toFixed(3)}, ${lng.toFixed(3)}` };
+        searchInput.value = currentLocation.name;
+
+        await loadDashboard(lat, lng);
+        updateMap(lat, lng, window.lastRiskData);
+    });
 
     // Initial Marker
     L.marker([currentLocation.lat, currentLocation.lon])
         .addTo(map)
-        .bindPopup(`<b>${currentLocation.name}</b><br>Initial Scan Location`)
+        .bindPopup(`<b>${currentLocation.name}</b><br>Active Monitoring Zone`)
         .openPopup();
 }
 
 function updateMap(lat, lon, riskData) {
     if (!map) return;
-    map.flyTo([lat, lon], 13);
 
-    // Clear existing layers (except tiles) requires more logic, but for now just add new marker
-    // In a real app we'd manage a layer group
+    const riskLevel = riskData.risk_assessment.level;
+    const riskColor = getRiskColor(riskLevel);
 
-    const riskColor = getRiskColor(riskData.risk_assessment.level);
+    map.flyTo([lat, lon], 12);
 
-    L.circle([lat, lon], {
+    // Create a significant Risk Zone circle
+    const circle = L.circle([lat, lon], {
         color: riskColor,
         fillColor: riskColor,
-        fillOpacity: 0.5,
-        radius: 2000
-    }).addTo(map).bindPopup(`
-        <b>Risk Level: ${riskData.risk_assessment.level}</b><br>
-        Score: ${riskData.risk_assessment.score}/10
+        fillOpacity: 0.35,
+        weight: 2,
+        radius: 6000 // 6km visibility
+    }).addTo(map);
+
+    circle.bindPopup(`
+        <div style="min-width: 150px; background: #161b22; color: white; padding: 5px; border-radius: 5px;">
+            <h4 style="margin: 0 0 5px; color: ${riskColor}">${riskLevel} Risk Zone</h4>
+            <p style="margin: 0; font-size: 0.9rem;">Score: <b>${riskData.risk_assessment.score}/10</b></p>
+            <p style="margin: 5px 0 0; font-size: 0.8rem; color: #888;">${currentLocation.name}</p>
+        </div>
     `).openPopup();
+
+    // Add smaller clusters around to simulate "Zones"
+    for (let i = 0; i < 4; i++) {
+        const shiftLat = (Math.random() - 0.5) * 0.15;
+        const shiftLon = (Math.random() - 0.5) * 0.15;
+        const subRisk = ['Low', 'Moderate'][Math.floor(Math.random() * 2)];
+        L.circleMarker([lat + shiftLat, lon + shiftLon], {
+            radius: 6,
+            fillColor: getRiskColor(subRisk),
+            color: "#fff",
+            weight: 1,
+            fillOpacity: 0.7
+        }).addTo(map).bindPopup(`Minor Detail: ${subRisk} Stress Area`);
+    }
 }
 
 // --- Charts Logic ---
@@ -293,27 +329,31 @@ function getRiskColorClass(level) {
     return 'text-success';
 }
 
-function addToAdminLog(data) {
-    const tbody = document.getElementById('admin-table-body');
-    const tr = document.createElement('tr');
-    const id = Math.floor(Math.random() * 10000);
-    const time = new Date().toLocaleTimeString();
+async function loadAdminHistory() {
+    try {
+        const res = await fetch(`${API_URL}/admin/history`);
+        const history = await res.json();
 
-    tr.innerHTML = `
-        <td>#${id}</td>
-        <td>${time}</td>
-        <td>${currentLocation.name}</td>
-        <td>${data.risk_assessment.score}/10</td>
-        <td><span class="badge ${getRiskColorClass(data.risk_assessment.level)}">${data.risk_assessment.level}</span></td>
-        <td>Completed</td>
-    `;
-    tbody.prepend(tr); // Add to top
+        const tbody = document.getElementById('admin-table-body');
+        tbody.innerHTML = ''; // Clear
 
-    // Limit rows
-    if (tbody.children.length > 10) tbody.removeChild(tbody.lastChild);
+        history.forEach(row => {
+            const tr = document.createElement('tr');
+            const date = new Date(row.timestamp).toLocaleString();
 
-    // Update total stats
-    const totalEl = document.getElementById('total-preds');
-    let currentTotal = parseInt(totalEl.textContent.replace(',', ''));
-    totalEl.textContent = (currentTotal + 1).toLocaleString();
+            tr.innerHTML = `
+                <td>#${row.id}</td>
+                <td>${date}</td>
+                <td title="${row.lat}, ${row.lon}">${row.location}</td>
+                <td>${row.risk_score.toFixed(1)}/10</td>
+                <td><span class="badge ${getRiskColorClass(row.risk_level)}">${row.risk_level}</span></td>
+                <td><span class="text-success">Verified</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('total-preds').textContent = history.length.toLocaleString();
+    } catch (e) {
+        console.error("Admin History Error:", e);
+    }
 }

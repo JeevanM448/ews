@@ -1,4 +1,7 @@
+import logging
 from typing import Dict, Any
+
+logger = logging.getLogger(__name__)
 
 def calculate_risk_score(weather: Dict, aqi_data: Dict) -> Dict[str, Any]:
     """Calculate environmental risk score based on weather and air quality."""
@@ -11,17 +14,16 @@ def calculate_risk_score(weather: Dict, aqi_data: Dict) -> Dict[str, Any]:
     humidity = weather.get("main", {}).get("humidity", 0)
     wind_speed = weather.get("wind", {}).get("speed", 0)
     
-    # AQI factors (OpenAQ structure or mock)
-    # The structure might vary, so we should be defensive
-    aqi_val = 0
-    if "main" in aqi_data and "aqi" in aqi_data["main"]:
-        aqi_val = aqi_data["main"]["aqi"]
-    elif "measurements" in aqi_data:
-        # Handle real OpenAQ results if needed, usually they return parameters
-        # For simplicity, assume the mock structure or normalize before calling
-        pass
-    else:
-        aqi_val = aqi_data.get("aqi", 0)
+    # AQI factors (Handling flattened OpenAQ or component structure)
+    aqi_val = aqi_data.get("aqi")
+    if aqi_val is None:
+        # Infer a simple 1-5 aqi from PM2.5 if missing
+        pm25 = aqi_data.get("pm25", aqi_data.get("components", {}).get("pm2_5", 0))
+        if pm25 > 150: aqi_val = 5
+        elif pm25 > 100: aqi_val = 4
+        elif pm25 > 50: aqi_val = 3
+        elif pm25 > 10: aqi_val = 2
+        else: aqi_val = 1
 
     # Logic
     if temp > 35:
@@ -75,7 +77,7 @@ def calculate_risk_score(weather: Dict, aqi_data: Dict) -> Dict[str, Any]:
             final_score = max(final_score, 7)
             
     except Exception as e:
-        print(f"ML Prediction Error: {e}")
+        logger.error(f"ML Prediction Error: {e}")
         ml_prediction = "Unavailable"
         ml_risk_val = -1
 

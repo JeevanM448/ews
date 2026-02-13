@@ -1,6 +1,9 @@
 import httpx
 import os
 from typing import Dict, Any
+import logging
+
+logger = logging.getLogger(__name__)
 
 API_KEY = os.getenv("OPENWEATHER_API_KEY")
 
@@ -34,7 +37,7 @@ async def fetch_weather_data(lat: float, lon: float) -> Dict[str, Any]:
             
             return data
         except httpx.HTTPError as e:
-            print(f"Error fetching weather data: {e}")
+            logger.error(f"Error fetching weather data: {e}")
             return {
                 "coord": {"lon": lon, "lat": lat},
                 "weather": [{"main": "Unknown", "description": "data unavailable"}],

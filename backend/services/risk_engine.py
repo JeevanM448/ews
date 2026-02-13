@@ -86,7 +86,8 @@ class RiskEngine:
                 "hour_of_day": data.get("hour_of_day"),
                 "day_of_week": data.get("day_of_week"),
                 "3_day_temp_avg": data.get("3_day_temp_avg"),
-                "7_day_rain_total": data.get("7_day_rain_total")
+                "7_day_rain_total": data.get("7_day_rain_total"),
+                "heat_index": data.get("heat_index")
             },
             "raw_data": data
         }
