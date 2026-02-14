@@ -56,32 +56,26 @@ def calculate_risk_score(weather: Dict, aqi_data: Dict) -> Dict[str, Any]:
     # Final Score normalization (1-10)
     final_score = max(1, min(10, score + 3)) # Base score 3
     
-    # ML Prediction Integration
+    # ML Flood Prediction Integration
     try:
         from backend.utils.risk_ml import risk_engine
-        # Extract PM2.5 safely (Mock structure or general fallback)
-        pm25 = aqi_data.get("components", {}).get("pm2_5", 0) 
-        if not pm25 and "measurements" in aqi_data:
-            # Try to find PM2.5 in OpenAQ measurements list if present
-            for m in aqi_data["measurements"]:
-                if m["parameter"] == "pm25":
-                    pm25 = m["value"]
-                    break
+        rainfall = weather.get("rain", {}).get("1h", 0)
         
-        ml_risk_val = risk_engine.predict_risk(temp, humidity, pm25)
-        ml_prediction = "High Risk" if ml_risk_val == 1 else "Low Risk"
+        ml_res = risk_engine.predict_flood_risk(rainfall, temp, humidity)
+        ml_prediction = f"Flood Risk: {ml_res['level']}"
+        ml_score = ml_res['score']
         
-        if ml_risk_val == 1:
-            factors.append("ML Model Alert")
-            # Boost score if ML predicts high risk
-            final_score = max(final_score, 7)
+        if ml_res['level'] in ["High", "Critical"]:
+            factors.append(f"AI Alert: {ml_res['level']} Flood Risk")
+            # Boost base score if AI detects flood danger
+            final_score = max(final_score, 8 if ml_res['level'] == "Critical" else 6)
             
     except Exception as e:
         logger.error(f"ML Prediction Error: {e}")
         ml_prediction = "Unavailable"
-        ml_risk_val = -1
-
-    risk_level = "Low"
+        ml_score = 0
+ 
+    risk_level = "Safe"
     if final_score >= 8:
         risk_level = "Critical"
     elif final_score >= 6:
@@ -94,6 +88,6 @@ def calculate_risk_score(weather: Dict, aqi_data: Dict) -> Dict[str, Any]:
         "level": risk_level,
         "factors": factors,
         "ml_model_prediction": ml_prediction,
-        "ml_raw_output": ml_risk_val,
+        "ml_raw_output": ml_score,
         "timestamp": "now"
     }

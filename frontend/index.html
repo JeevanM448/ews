@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoGuard AI - Environmental Risk Prediction</title>
+    <title>Kerala SafeAI - Early Warning System</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,6 +16,10 @@
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="emergency.css">
+    <link rel="stylesheet" href="forecast.css">
+    <link rel="stylesheet" href="ai_features.css">
+    <link rel="stylesheet" href="disaster_mode.css">
 
     <!-- External JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -28,8 +32,8 @@
         <!-- Sidebar -->
         <nav class="sidebar">
             <div class="logo">
-                <i class="fa-solid fa-leaf"></i>
-                <span>EcoGuard AI</span>
+                <i class="fa-solid fa-cloud-bolt"></i>
+                <span>Kerala SafeAI</span>
             </div>
             <ul class="nav-links">
                 <li class="active" data-tab="dashboard">
@@ -45,7 +49,7 @@
                     <span>Admin Panel</span>
                 </li>
             </ul>
-            <div class="status-indicator">
+            <div class="status-indicator" id="system-status-indicator">
                 <span class="dot online"></span>
                 System Online
             </div>
@@ -56,8 +60,17 @@
             <header class="top-bar">
                 <div class="search-bar">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="location-search" placeholder="Search location..." value="London">
+                    <input type="text" id="location-search" placeholder="Search Place in Kerala..."
+                        value="Thiruvananthapuram">
                     <button id="search-btn">Analyze</button>
+                    <select id="district-selector" class="district-select">
+                        <option value="">Quick Select District</option>
+                    </select>
+                </div>
+                <div class="language-toggle">
+                    <button id="lang-en" class="lang-btn active">ENG</button>
+                    <span class="divider">|</span>
+                    <button id="lang-ml" class="lang-btn">MAL</button>
                 </div>
                 <div class="user-profile">
                     <div class="notification-bell">
@@ -72,7 +85,7 @@
             <!-- Dashboard View -->
             <section id="dashboard" class="view active">
                 <div class="dashboard-header">
-                    <h1>Environmental Overview</h1>
+                    <h1>Kerala SafeAI Dashboard</h1>
                     <p class="date-display" id="current-date">Fetching data...</p>
                 </div>
 
@@ -80,9 +93,12 @@
                     <div class="stat-card risk-card" id="risk-card">
                         <div class="stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
                         <div class="stat-info">
-                            <h3>Risk Level</h3>
-                            <h2 id="risk-val">--</h2>
-                            <p id="risk-desc">Waiting for input...</p>
+                            <h3>Risk Assessment</h3>
+                            <h2 style="display: flex; align-items: baseline; gap: 10px;">
+                                <span id="risk-score">0</span>
+                                <span id="risk-level" class="level-badge">Safe</span>
+                            </h2>
+                            <p id="risk-desc">Monitoring District Conditions...</p>
                             <p class="ml-badge" id="ml-pred-val"><i class="fa-solid fa-robot"></i> ML: --</p>
                         </div>
                     </div>
@@ -117,6 +133,93 @@
                             <p class="sub-stat">Sentiment: <span id="social-sentiment">--</span></p>
                         </div>
                     </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-clock-rotate-left"
+                                style="color: var(--accent);"></i></div>
+                        <div class="stat-info">
+                            <h3>Current Temperature</h3>
+                            <h2 id="real-time-temp">Loading...</h2>
+                            <p class="sub-stat">Malappuram Area</p>
+                        </div>
+                    </div>
+
+                    <!-- NEW: Satellite Analysis Card -->
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-satellite" style="color: #6366f1;"></i></div>
+                        <div class="stat-info">
+                            <h3>Satellite AI Analysis</h3>
+                            <h2 id="sat-risk">Scanning...</h2>
+                            <p class="sub-stat">Water Coverage: <span id="sat-water">--</span>%</p>
+                        </div>
+                    </div>
+
+                    <!-- Fusion Score Card -->
+                    <div class="stat-card fusion-card" style="border-left: 4px solid #8b5cf6;">
+                        <div class="stat-icon"><i class="fa-solid fa-brain" style="color: #8b5cf6;"></i></div>
+                        <div class="stat-info">
+                            <h3>AI Fused Risk Score</h3>
+                            <h2 id="fusion-score">--</h2>
+                            <p class="sub-stat">Combined Intelligence</p>
+                        </div>
+                    </div>
+
+                    <!-- Evacuation Advice -->
+                    <div class="stat-card" style="border-left: 4px solid #ec4899;">
+                        <div class="stat-icon"><i class="fa-solid fa-person-walking-arrow-right"
+                                style="color: #ec4899;"></i></div>
+                        <div class="stat-info">
+                            <h3>Evacuation Status</h3>
+                            <h2 id="evac-action">--</h2>
+                            <p class="sub-stat" id="evac-msg">--</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="safety-features-section">
+                    <div class="safety-features-card">
+                        <h3><i class="fa-solid fa-shield-heart"></i> Disaster Safety Features</h3>
+                        <div class="features-list">
+                            <div class="feature-item">
+                                <i class="fa-solid fa-bell"></i>
+                                <span>Emergency Alert Button</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fa-solid fa-temperature-full"></i>
+                                <span>Real-time Temperature Monitoring</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fa-solid fa-location-crosshairs"></i>
+                                <span>Location Sharing</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fa-solid fa-hand-holding-medical"></i>
+                                <span>SOS Notification to Authorities</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                <span>Hazard Detection Alerts</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fa-solid fa-map-signs"></i>
+                                <span>Safe Zone Directions</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Humidity Spot Check Component -->
+                    <div class="humidity-checker-card">
+                        <h3><i class="fa-solid fa-droplet"></i> Spot Humidity Check</h3>
+                        <div class="spot-input-group">
+                            <input type="text" id="spot-humidity-input" placeholder="Enter city name (e.g. London)...">
+                            <button id="spot-humidity-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+                        </div>
+                        <div id="spot-humidity-result" class="spot-result hidden">
+                            <h2 id="spot-humid-val">--%</h2>
+                            <p id="spot-humid-loc" class="sub-stat">--</p>
+                        </div>
+                        <div id="spot-humidity-loading" class="spot-loading hidden">Searching...</div>
+                        <div id="spot-humidity-error" class="spot-error hidden">City not found</div>
+                    </div>
                 </div>
 
                 <div class="charts-container">
@@ -124,9 +227,19 @@
                         <h3>Risk Components Breakdown</h3>
                         <canvas id="riskChart"></canvas>
                     </div>
-                    <div class="chart-wrapper">
-                        <h3>Hourly Forecast Trend</h3>
-                        <canvas id="trendChart"></canvas>
+                    <div class="chart-wrapper forecast-wrapper">
+                        <div class="forecast-header">
+                            <h3>Hourly Forecast Trend</h3>
+                            <div class="forecast-toggles" id="forecast-toggles">
+                                <button class="toggle-btn active" data-view="temp">Temp</button>
+                                <button class="toggle-btn" data-view="rain">Rain</button>
+                                <button class="toggle-btn" data-view="wind">Wind</button>
+                                <button class="toggle-btn" data-view="risk">Risk</button>
+                            </div>
+                        </div>
+                        <div id="hourly-forecast-container" class="hourly-forecast-scroll">
+                            <div class="loading-forecast">Loading hourly data...</div>
+                        </div>
                     </div>
                 </div>
 
@@ -134,6 +247,14 @@
                     <h3>Recent Alerts</h3>
                     <ul class="alert-list" id="alert-list">
                         <!-- Alerts populated by JS -->
+                    </ul>
+                </div>
+
+                <!-- NEW: Offline Safety Instructions Container -->
+                <div id="offline-safety-instructions" class="offline-instructions hidden">
+                    <h3><i class="fa-solid fa-person-shelter"></i> Offline Safety Guidelines</h3>
+                    <ul class="instruction-list" id="instructions-container">
+                        <!-- Populated by JS -->
                     </ul>
                 </div>
 
@@ -179,6 +300,11 @@
                 </div>
 
                 <div class="admin-panel">
+                    <h3><i class="fa-solid fa-map-pin"></i> Live Emergency Map</h3>
+                    <div id="admin-map-container"
+                        style="height: 400px; width: 100%; border-radius: 1rem; border: 1px solid var(--border); margin: 1.5rem 0; z-index: 10;">
+                    </div>
+
                     <div class="admin-stats">
                         <div class="mini-stat">Total Predictions: <span id="total-preds">1,245</span></div>
                         <div class="mini-stat">API Health: <span class="text-success">Good</span></div>
@@ -204,7 +330,53 @@
         </main>
     </div>
 
+    <!-- Emergency Trigger Button -->
+    <button id="emergency-btn" class="emergency-trigger" aria-label="Emergency Alert">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <div class="pulse-ring"></div>
+    </button>
+
+    <!-- Emergency Modal -->
+    <div id="emergency-modal" class="modal-overlay">
+        <div class="modal-content emergency-alert">
+            <div class="alert-header">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <h2>KERALA SAFEAI ALERT</h2>
+            </div>
+            <div class="alert-body">
+                <p id="emergency-location">Emergency at ABC area</p>
+                <div id="emergency-status" class="alert-status"></div>
+                <div class="alert-scanner"></div>
+            </div>
+            <button id="close-emergency" class="modal-close">Acknowledge</button>
+        </div>
+    </div>
+
+    <!-- AI Safety Assistant Chatbot -->
+    <div id="ai-chat-widget" class="chat-widget collapsed">
+        <div class="chat-header" id="chat-toggle">
+            <div class="chat-title">
+                <i class="fa-solid fa-robot"></i> SafeAI Assistant
+            </div>
+            <i class="fa-solid fa-chevron-up toggle-icon"></i>
+        </div>
+        <div class="chat-body">
+            <div id="chat-messages" class="chat-messages">
+                <div class="msg bot">Hello! I am Kerala SafeAI. How can I help you stay safe today?</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Ask about floods, safety...">
+                <button id="chat-send"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="offline_manager.js"></script>
+    <script src="translations.js"></script>
     <script src="app.js"></script>
+    <script src="humidity_component.js"></script>
+    <script src="recent_alerts.js"></script>
 </body>
 
 </html>

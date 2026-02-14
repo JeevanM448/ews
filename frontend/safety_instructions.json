@@ -1,0 +1,45 @@
+[
+    {
+        "type": "Flood",
+        "instructions": [
+            "Move to higher ground immediately.",
+            "Do not walk or drive through flood waters.",
+            "Turn off utilities at the main switches if instructed.",
+            "Disconnect electrical appliances.",
+            "Keep an emergency kit ready with food, water, and medicines."
+        ],
+        "severity_trigger": [
+            "High",
+            "Critical"
+        ]
+    },
+    {
+        "type": "Landslide",
+        "instructions": [
+            "Stay alert for sudden changes in water flow or earth movement.",
+            "If you are near a stream or channel, be alert for sudden changes in water levels.",
+            "Move out of the path of a landslide or debris flow as quickly as possible.",
+            "If escape is impossible, curl into a tight ball and protect your head.",
+            "Evacuate immediately if you hear unusual sounds like trees cracking."
+        ],
+        "severity_trigger": [
+            "High",
+            "Critical"
+        ]
+    },
+    {
+        "type": "Heatwave",
+        "instructions": [
+            "Stay indoors and keep your house cool.",
+            "Drink plenty of water even if not thirsty.",
+            "Avoid strenuous physical activity during peak heat hours (11am - 3pm).",
+            "Wear lightweight, light-colored, loose cotton clothes.",
+            "Help the elderly and children stay hydrated."
+        ],
+        "severity_trigger": [
+            "Moderate",
+            "High",
+            "Critical"
+        ]
+    }
+]

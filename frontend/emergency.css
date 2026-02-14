@@ -1,0 +1,306 @@
+/* Emergency Trigger Button Styles */
+.emergency-trigger {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    width: 60px;
+    height: 60px;
+    background-color: #f85149;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 10000;
+    box-shadow: 0 0 20px rgba(248, 81, 73, 0.4);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.emergency-trigger:hover {
+    transform: scale(1.1);
+    background-color: #ff5f56;
+    box-shadow: 0 0 30px rgba(248, 81, 73, 0.6);
+}
+
+.emergency-trigger:active {
+    transform: scale(0.95);
+}
+
+.emergency-trigger i {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.emergency-trigger:hover i {
+    transform: rotate(12deg);
+}
+
+.pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 4px solid #f85149;
+    animation: emergency-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    opacity: 0;
+    pointer-events: none;
+}
+
+@keyframes emergency-ping {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Emergency Alert Content */
+.emergency-alert {
+    background: #111;
+    border: 3px solid #f85149;
+    padding: 3rem;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 0 50px rgba(248, 81, 73, 0.5);
+    transform: scale(0.8);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-overlay.active .emergency-alert {
+    transform: scale(1);
+}
+
+.alert-header i {
+    font-size: 5rem;
+    color: #f85149;
+    margin-bottom: 1rem;
+    animation: alert-flash 0.5s infinite alternate;
+}
+
+.alert-header h2 {
+    font-size: 2.5rem;
+    letter-spacing: 2px;
+    color: #fff;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+}
+
+.alert-body p {
+    font-size: 1.5rem;
+    color: #ccc;
+    margin-bottom: 0.5rem;
+}
+
+.alert-status {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 1rem 0;
+    padding: 0.75rem;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.3s ease;
+    word-wrap: break-word;
+    line-height: 1.4;
+}
+
+.alert-status.info {
+    color: #58a6ff;
+    background: rgba(88, 166, 255, 0.1);
+}
+
+.alert-status.success {
+    color: #3fb950;
+    background: rgba(63, 185, 80, 0.1);
+}
+
+.alert-status.error {
+    color: #f85149;
+    background: rgba(248, 81, 73, 0.1);
+}
+
+.alert-scanner {
+    height: 4px;
+    background: #f85149;
+    width: 100%;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.alert-scanner::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, #fff, transparent);
+    animation: scan 1.5s infinite;
+}
+
+.modal-close {
+    background: #f85149;
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: #fff;
+    color: #f85149;
+    transform: translateY(-2px);
+}
+
+@keyframes alert-flash {
+    from {
+        color: #f85149;
+        text-shadow: 0 0 10px #f85149;
+    }
+
+    to {
+        color: #fff;
+        text-shadow: 0 0 20px #fff;
+    }
+}
+
+@keyframes scan {
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
+    }
+}
+
+/* Disaster Safety Features Card */
+.safety-features-section {
+    margin: 2rem 0;
+}
+
+.safety-features-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 1.25rem;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.safety-features-card:hover {
+    border-color: rgba(88, 166, 255, 0.3);
+}
+
+.safety-features-card h3 {
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 600;
+}
+
+.safety-features-card h3 i {
+    color: var(--accent);
+    filter: drop-shadow(0 0 8px var(--accent-glow));
+}
+
+.features-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.25rem;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.feature-item:hover {
+    background: rgba(88, 166, 255, 0.08);
+    transform: translateX(10px) scale(1.02);
+    border-color: var(--accent);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.feature-item i {
+    font-size: 1.5rem;
+    color: var(--accent);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(88, 166, 255, 0.1);
+    border-radius: 0.75rem;
+    transition: var(--transition);
+}
+
+.feature-item:hover i {
+    background: var(--accent);
+    color: white;
+    transform: rotate(-10deg);
+}
+
+.feature-item span {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.feature-item:hover span {
+    color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+    .features-list {
+        grid-template-columns: 1fr;
+    }
+}

@@ -23,17 +23,23 @@ class RiskEngine:
             logger.error(f"Risk Engine Data Error: {data['error']}")
             raise Exception(data["error"])
 
-        # 2. ML Inference
+        # 2. ML Inference (Kerala Flood Focus)
         try:
-            ml_risk_val = risk_engine.predict_risk(
-                data["temperature"], 
-                data["humidity"], 
-                data["pm25"]
+            ml_res = risk_engine.predict_flood_risk(
+                rainfall=data["rainfall"],
+                temp=data["temperature"], 
+                humidity=data["humidity"],
+                rain_1d=data.get("rain_1d", 0),
+                rain_3d=data.get("rain_3d", 0),
+                rain_7d=data.get("7_day_rain_total", 0),
+                temp_trend=data.get("temp_trend", 0),
+                humid_trend=data.get("humid_trend", 0)
             )
-            ml_label = "High Risk" if ml_risk_val == 1 else "Low Risk"
+            ml_score = ml_res["score"]
+            ml_label = ml_res["level"]
         except Exception as e:
             logger.error(f"ML Engine Error: {e}")
-            ml_risk_val = 0
+            ml_score = 0
             ml_label = "Unavailable"
 
         # 3. Social Stress Analysis
@@ -46,25 +52,26 @@ class RiskEngine:
         # Combine Scores (70% Environmental, 30% Social)
         env_score = base_assessment["score"]
         social_score = social_data["score"]
-        combined_score = round((env_score * 0.7) + (social_score * 0.3), 1)
+        # Scale to 0-100 (Original scores were 1-10)
+        combined_score = round(((env_score * 0.7) + (social_score * 0.3)) * 10, 0)
 
         # Determine Final Severity Label
-        final_severity = "Low"
-        if combined_score >= 8: final_severity = "Critical"
-        elif combined_score >= 6: final_severity = "High"
-        elif combined_score >= 4: final_severity = "Moderate"
+        final_level = "Safe"
+        if combined_score >= 80: final_level = "Critical"
+        elif combined_score >= 60: final_level = "High"
+        elif combined_score >= 35: final_level = "Moderate"
 
         return {
             "score": combined_score,
-            "severity_label": final_severity,
+            "severity_label": final_level,
             "environmental_base": {
-                "score": env_score,
+                "score": env_score * 10,
                 "label": base_assessment["level"]
             },
             "social_overlay": social_data,
             "ml_prediction": {
                 "label": ml_label,
-                "raw_value": ml_risk_val
+                "raw_value": ml_score
             },
             "contributing_factors": base_assessment["factors"],
             "aggregated_metrics": {

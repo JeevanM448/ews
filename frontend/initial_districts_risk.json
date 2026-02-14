@@ -1,0 +1,128 @@
+[
+    {
+        "district": "Thiruvananthapuram",
+        "score": 25,
+        "level": "Safe",
+        "lat": 8.5241,
+        "lon": 76.9366,
+        "temp": 28,
+        "humidity": 75
+    },
+    {
+        "district": "Kollam",
+        "score": 30,
+        "level": "Safe",
+        "lat": 8.8932,
+        "lon": 76.6141,
+        "temp": 29,
+        "humidity": 72
+    },
+    {
+        "district": "Pathanamthitta",
+        "score": 55,
+        "level": "Moderate",
+        "lat": 9.2648,
+        "lon": 76.7870,
+        "temp": 27,
+        "humidity": 80
+    },
+    {
+        "district": "Alappuzha",
+        "score": 65,
+        "level": "High",
+        "lat": 9.4981,
+        "lon": 76.3388,
+        "temp": 28,
+        "humidity": 85
+    },
+    {
+        "district": "Kottayam",
+        "score": 40,
+        "level": "Moderate",
+        "lat": 9.5916,
+        "lon": 76.5222,
+        "temp": 28,
+        "humidity": 78
+    },
+    {
+        "district": "Idukki",
+        "score": 85,
+        "level": "Critical",
+        "lat": 9.8517,
+        "lon": 76.9746,
+        "temp": 22,
+        "humidity": 90
+    },
+    {
+        "district": "Ernakulam",
+        "score": 45,
+        "level": "Moderate",
+        "lat": 9.9816,
+        "lon": 76.2999,
+        "temp": 30,
+        "humidity": 75
+    },
+    {
+        "district": "Thrissur",
+        "score": 35,
+        "level": "Safe",
+        "lat": 10.5276,
+        "lon": 76.2144,
+        "temp": 31,
+        "humidity": 70
+    },
+    {
+        "district": "Palakkad",
+        "score": 75,
+        "level": "High",
+        "lat": 10.7867,
+        "lon": 76.6547,
+        "temp": 38,
+        "humidity": 45
+    },
+    {
+        "district": "Malappuram",
+        "score": 50,
+        "level": "Moderate",
+        "lat": 11.0735,
+        "lon": 76.0740,
+        "temp": 30,
+        "humidity": 76
+    },
+    {
+        "district": "Kozhikode",
+        "score": 40,
+        "level": "Moderate",
+        "lat": 11.2588,
+        "lon": 75.7804,
+        "temp": 29,
+        "humidity": 78
+    },
+    {
+        "district": "Wayanad",
+        "score": 80,
+        "level": "Critical",
+        "lat": 11.6854,
+        "lon": 76.1320,
+        "temp": 24,
+        "humidity": 88
+    },
+    {
+        "district": "Kannur",
+        "score": 30,
+        "level": "Safe",
+        "lat": 11.8745,
+        "lon": 75.3704,
+        "temp": 30,
+        "humidity": 75
+    },
+    {
+        "district": "Kasaragod",
+        "score": 25,
+        "level": "Safe",
+        "lat": 12.5101,
+        "lon": 74.9852,
+        "temp": 31,
+        "humidity": 72
+    }
+]
